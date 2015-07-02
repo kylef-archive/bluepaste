@@ -1,0 +1,13 @@
+gunicorn==19.3.0
+invoke==0.10.1
+negotiator==1.0.0
+peewee==2.6.1
+psycopg2==2.6.1
+rivr==0.6.0
+rivr-peewee==0.2.0
+-e git+https://github.com/rivrproject/rivr-rest@7360d90a7ed15a6be63596540a33b8837161752c#egg=rivr_rest-master
+-e git+https://github.com/rivrproject/rivr-rest-peewee@602ea52a79044814453839d2774bfde89c69b88a#egg=rivr_rest_peewee-master
+simplejson==3.7.3
+six==1.9.0
+uritemplate==0.6
+wsgiref==0.1.2
