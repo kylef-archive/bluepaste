@@ -62,10 +62,18 @@ class BlueprintResource(PeeweeResource):
 
     def post(self, request):
         blueprint = self.get_object()
-        content = request.body.read(request.content_length)
-
         if request.content_length == 0:
             return Response(status=400)
+
+        content_type = request.headers.get('CONTENT_TYPE', None)
+
+        if content_type == 'text/vnd.apiblueprint+markdown':
+            content = request.body.read(request.content_length)
+        else:
+            content = request.POST.get('blueprint', '')
+            if len(content) == 0:
+                return Response(status=400)
+
 
         revision = blueprint.create_revision(content)
         response = self.revisions(obj=revision).get(request)
@@ -91,10 +99,17 @@ class RootResource(Resource):
         return providers
 
     def post(self, request):
-        content = request.body.read(request.content_length)
-
         if request.content_length == 0:
             return Response(status=400)
+
+        content_type = request.headers.get('CONTENT_TYPE', None)
+
+        if content_type == 'text/vnd.apiblueprint+markdown':
+            content = request.body.read(request.content_length)
+        else:
+            content = request.POST.get('blueprint', '')
+            if len(content) == 0:
+                return Response(status=400)
 
         slug = sha1(datetime.now().isoformat() + content).hexdigest()[:8]
         blueprint = Blueprint.create(slug=slug)
