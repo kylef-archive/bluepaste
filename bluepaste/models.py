@@ -16,6 +16,10 @@ class Blueprint(database.Model):
         slug = sha1(slug_content).hexdigest()
         return Revision.create(blueprint=self, slug=slug, content=content)
 
+    @property
+    def last_revision(self):
+        return self.revisions[0]
+
 
 class Revision(database.Model):
     blueprint = peewee.ForeignKeyField(Blueprint, related_name='revisions')
@@ -28,4 +32,7 @@ class Revision(database.Model):
         indexes = (
             (('blueprint', 'slug'), True),
         )
+
+    def __str__(self):
+        return self.content
 

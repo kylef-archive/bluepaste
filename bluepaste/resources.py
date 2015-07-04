@@ -14,7 +14,7 @@ class RevisionResource(PeeweeResource):
     def get_parameters(self):
         revision = self.get_object()
         return {
-            'slug': revision.slug,
+            'slug': revision.slug[:8],
             'blueprint': revision.blueprint.slug,
         }
 
@@ -23,7 +23,7 @@ class RevisionResource(PeeweeResource):
             blueprint_slug = self.parameters['blueprint']
             slug = self.parameters['slug']
             self.obj = self.get_query().filter(
-                slug=slug,
+                Revision.slug.startswith(slug),
                 blueprint__slug=blueprint_slug
             ).get()
 
@@ -33,9 +33,13 @@ class RevisionResource(PeeweeResource):
         def blueprint_markdown_provider():
             return Response(self.get_object().content, content_type='text/vnd.apiblueprint+markdown')
 
+        def html_provider():
+            return JinjaResponse(self.request, template_names=['revision.html'], context={'revision': self.get_object()})
+
         providers = super(RevisionResource, self).content_type_providers()
         providers.update({
             'text/vnd.apiblueprint+markdown': blueprint_markdown_provider,
+            'text/html': html_provider,
         })
 
         return providers
@@ -53,9 +57,13 @@ class BlueprintResource(PeeweeResource):
         def blueprint_markdown_provider():
             return Response(self.get_object().revisions[0].content, content_type='text/vnd.apiblueprint+markdown')
 
+        def html_provider():
+            return JinjaResponse(self.request, template_names=['blueprint.html'], context={'blueprint': self.get_object()})
+
         providers = super(BlueprintResource, self).content_type_providers()
         providers.update({
             'text/vnd.apiblueprint+markdown': blueprint_markdown_provider,
+            'text/html': html_provider,
         })
 
         return providers
@@ -114,10 +122,12 @@ class RootResource(Resource):
         slug = sha1(datetime.now().isoformat() + content).hexdigest()[:8]
         blueprint = Blueprint.create(slug=slug)
         revision = blueprint.create_revision(content)
-        response = BlueprintResource(obj=blueprint).get(request)
+        revision_resource = RevisionResource(obj=revision)
+        response = revision_resource.get(request)
 
         if response.status_code == 200:
-            response.status_code = 201
+            response.status_code = 307
+            response.headers['Location'] = revision_resource.get_uri()
 
         return response
 
