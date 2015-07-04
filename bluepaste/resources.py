@@ -3,6 +3,7 @@ from hashlib import sha1
 from rivr import Response
 from rivr_rest import Router, Resource
 from rivr_rest_peewee import PeeweeResource
+from rivr_jinja import JinjaResponse
 from bluepaste.models import database, Blueprint, Revision
 
 
@@ -77,6 +78,17 @@ class BlueprintResource(PeeweeResource):
 
 class RootResource(Resource):
     uri_template = '/'
+
+    def content_type_providers(self):
+        def html_provider():
+            return JinjaResponse(self.request, template_names=['index.html'], context={})
+
+        providers = super(RootResource, self).content_type_providers()
+        providers.update({
+            'text/html': html_provider,
+        })
+
+        return providers
 
     def post(self, request):
         content = request.body.read(request.content_length)
