@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
 {% block body %}
-<pre><code>
-    {{ revision.content }}
-</code></pre>
+{{ revision.highlighted_content }}
 {% endblock %}
 

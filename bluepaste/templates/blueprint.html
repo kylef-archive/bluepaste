@@ -1,8 +1,6 @@
 {% extends "base.html" %}
 
 {% block body %}
-<pre><code>
-    {{ blueprint.last_revision.content }}
-</code></pre>
+    {{ blueprint.last_revision.highlighted_content }}
 {% endblock %}
 

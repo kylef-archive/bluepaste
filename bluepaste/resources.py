@@ -126,7 +126,7 @@ class RootResource(Resource):
         response = revision_resource.get(request)
 
         if response.status_code == 200:
-            response.status_code = 307
+            response.status_code = 302
             response.headers['Location'] = revision_resource.get_uri()
 
         return response

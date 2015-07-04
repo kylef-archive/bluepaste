@@ -1,10 +1,12 @@
-Jinja2==2.7.3
-MarkupSafe==0.23
 gunicorn==19.3.0
 invoke==0.10.1
+Jinja2==2.7.3
+MarkupSafe==0.23
 negotiator==1.0.0
 peewee==2.6.1
 psycopg2==2.6.1
+Pygments==2.0.2
+pygments-markdown-lexer==0.1.0.dev0
 rivr==0.6.0
 rivr-jinja==0.1.1
 rivr-peewee==0.2.0
@@ -13,4 +15,3 @@ rivr-peewee==0.2.0
 simplejson==3.7.3
 six==1.9.0
 uritemplate==0.6
-wsgiref==0.1.2

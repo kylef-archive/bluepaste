@@ -2,6 +2,9 @@ import datetime
 from hashlib import sha1
 import peewee
 from rivr_peewee import Database
+from pygments import highlight
+from pygments.formatters import HtmlFormatter
+from pygments_markdown_lexer.lexer import MarkdownLexer
 
 
 database = Database()
@@ -35,4 +38,8 @@ class Revision(database.Model):
 
     def __str__(self):
         return self.content
+
+    @property
+    def highlighted_content(self):
+        return highlight(self.content, MarkdownLexer(), HtmlFormatter())
 
