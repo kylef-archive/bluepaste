@@ -1,11 +1,13 @@
 {% extends "base.html" %}
 
 {% block body %}
-  <section>
-    <form action="/" method="post">
-      <textarea rows="15" cols="40" name="blueprint"></textarea>
-      <button type="submit">Share</button>
-    </form>
-  </section>
+  <h2>New Blueprint</h2>
+
+  <form action="/" method="post">
+    <div class="form-group">
+      <textarea rows="15" cols="40" name="blueprint" class="form-control"></textarea>
+     </div>
+    <button type="submit" class="btn btn-primary">Share</button>
+  </form>
 {% endblock %}
 

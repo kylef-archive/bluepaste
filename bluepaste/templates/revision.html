@@ -3,19 +3,19 @@
 {% block body %}
   {% set ast = revision.ast %}
 
-  <h1>{{ ast.name }}</h1>
+  <h2>{{ ast.name }}</h2>
   <p>{{ ast.description }}</p>
 
   {% for resourceGroup in ast.resourceGroups %}
-    <h2>{{ resourceGroup.name }}</h2>
+    <h3>{{ resourceGroup.name }}</h3>
     <p>{{ resourceGroup.description }}</p>
 
     {% for resource in resourceGroup.resources %}
-      <h3>{{ resource.name }}</h3>
+      <h4>{{ resource.name }}</h4>
       <p>{{ resource.description }}</p>
 
       {% for action in resource.actions %}
-        <h4>{{ action.name }}</h4>
+        <h5>{{ action.name }}</h5>
         <p>{{ action.description }}</p>
       {% endfor %}
     {% endfor %}
