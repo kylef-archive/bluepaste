@@ -1,5 +1,6 @@
 import datetime
 from hashlib import sha1
+import requests
 import peewee
 from rivr_peewee import Database
 from pygments import highlight
@@ -42,4 +43,11 @@ class Revision(database.Model):
     @property
     def highlighted_content(self):
         return highlight(self.content, MarkdownLexer(), HtmlFormatter())
+
+    @property
+    def ast(self):
+        if not hasattr(self, '_ast'):
+            self._ast = requests.post('https://api.apiblueprint.org/parser', data=self.content).json()['ast']
+
+        return self._ast
 

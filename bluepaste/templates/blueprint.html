@@ -1,6 +1,3 @@
-{% extends "base.html" %}
-
-{% block body %}
-    {{ blueprint.last_revision.highlighted_content }}
-{% endblock %}
+{% set revision = blueprint.last_revision %}
+{% include "revision.html" %}
 
