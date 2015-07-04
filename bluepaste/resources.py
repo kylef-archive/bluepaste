@@ -97,7 +97,12 @@ class RootResource(Resource):
 
     def content_type_providers(self):
         def html_provider():
-            return JinjaResponse(self.request, template_names=['index.html'], context={})
+            with open('bluepaste/static/polls-api.md', 'r') as fp:
+                blueprint = fp.read()
+
+            return JinjaResponse(self.request, template_names=['index.html'], context={
+                'default_blueprint': blueprint,
+            })
 
         providers = super(RootResource, self).content_type_providers()
         providers.update({
