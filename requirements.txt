@@ -7,6 +7,7 @@ peewee==2.6.1
 psycopg2==2.6.1
 Pygments==2.0.2
 pygments-markdown-lexer==0.1.0.dev0
+requests==2.7.0
 rivr==0.6.0
 rivr-jinja==0.1.1
 rivr-peewee==0.2.0

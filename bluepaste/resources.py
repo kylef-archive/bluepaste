@@ -1,10 +1,10 @@
-from datetime import datetime
+import datetime
 from hashlib import sha1
 from rivr import Response
 from rivr_rest import Router, Resource
 from rivr_rest_peewee import PeeweeResource
 from rivr_jinja import JinjaResponse
-from bluepaste.models import database, Blueprint, Revision
+from bluepaste.models import database, Blueprint, Revision, EXPIRE_CHOICES, EXPIRE_DEFAULT
 
 
 class RevisionResource(PeeweeResource):
@@ -24,7 +24,8 @@ class RevisionResource(PeeweeResource):
             slug = self.parameters['slug']
             self.obj = self.get_query().filter(
                 Revision.slug.startswith(slug),
-                blueprint__slug=blueprint_slug
+                blueprint__slug=blueprint_slug,
+                blueprint__expires__gt=datetime.datetime.now(),
             ).get()
 
         return self.obj
@@ -52,6 +53,10 @@ class BlueprintResource(PeeweeResource):
     slug_field = 'slug'
 
     revisions = RevisionResource
+
+    def get_query(self):
+        return self.model.select().filter(Blueprint.expires >= datetime.datetime.now())
+
 
     def content_type_providers(self):
         def blueprint_markdown_provider():
@@ -102,6 +107,8 @@ class RootResource(Resource):
 
             return JinjaResponse(self.request, template_names=['index.html'], context={
                 'default_blueprint': blueprint,
+                'expire_choices': EXPIRE_CHOICES,
+                'expire_default': EXPIRE_DEFAULT,
             })
 
         providers = super(RootResource, self).content_type_providers()
@@ -119,13 +126,18 @@ class RootResource(Resource):
 
         if content_type == 'text/vnd.apiblueprint+markdown':
             content = request.body.read(request.content_length)
+            expires = EXPIRE_DEFAULT
         else:
             content = request.POST.get('blueprint', '')
             if len(content) == 0:
                 return Response(status=400)
+            expires = request.POST.get('expires', EXPIRE_DEFAULT)
 
-        slug = sha1(datetime.now().isoformat() + content).hexdigest()[:8]
-        blueprint = Blueprint.create(slug=slug)
+        expires = datetime.datetime.now() + \
+            datetime.timedelta(seconds=int(expires))
+
+        slug = sha1(datetime.datetime.now().isoformat() + content).hexdigest()[:8]
+        blueprint = Blueprint.create(slug=slug, expires=expires)
         revision = blueprint.create_revision(content)
         revision_resource = RevisionResource(obj=revision)
         response = revision_resource.get(request)

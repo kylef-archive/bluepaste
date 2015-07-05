@@ -7,6 +7,21 @@
     <div class="form-group">
       <textarea rows="15" cols="40" name="blueprint" class="form-control">{{ default_blueprint }}</textarea>
      </div>
+
+    <div class="form-group">
+      <label for="id_expire_options" class="control-label">
+        Expires
+      </label>
+
+      <div class="controls">
+        <select name="expire_options" id="id_expire_options">
+          {% for value, choice in expire_choices %}
+            <option value="{{ value }}"{% if value == expire_default %} selected="selected"{% endif %}>{{ choice }}</option>
+          {% endfor %}
+        </select>
+      </div>
+    </div>
+
     <button type="submit" class="btn btn-primary">Share</button>
   </form>
 {% endblock %}

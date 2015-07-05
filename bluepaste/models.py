@@ -11,8 +11,21 @@ from pygments_markdown_lexer.lexer import MarkdownLexer
 database = Database()
 
 
+EXPIRE_CHOICES = (
+    (600,        'In 10 minutes'),
+    (3600,       'In one hour'),
+    (3600*24,    'In one day'),
+    (3600*24*7,  'In one week'),
+    (3600*24*14, 'In two weeks'),
+    (3600*24*30, 'In one month'),
+)
+
+EXPIRE_DEFAULT = 3600*24*14
+
+
 class Blueprint(database.Model):
     slug = peewee.CharField(max_length=32, unique=True)
+    expires = peewee.DateTimeField()
 
     def create_revision(self, content):
         created_at = datetime.datetime.now()
