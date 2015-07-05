@@ -18,17 +18,15 @@ class RevisionResource(PeeweeResource):
             'blueprint': revision.blueprint.slug,
         }
 
-    def get_object(self):
-        if not self.obj:
-            blueprint_slug = self.parameters['blueprint']
-            slug = self.parameters['slug']
-            self.obj = self.get_query().filter(
-                Revision.slug.startswith(slug),
-                blueprint__slug=blueprint_slug,
-                blueprint__expires__gt=datetime.datetime.now(),
-            ).get()
+    def get_query(self):
+        slug = self.parameters['slug']
+        blueprint_slug = self.parameters['blueprint']
 
-        return self.obj
+        return self.model.select().filter(
+            Revision.slug.startswith(slug),
+            blueprint__slug=blueprint_slug,
+            blueprint__expires__gt=datetime.datetime.now(),
+        )
 
     def content_type_providers(self):
         def blueprint_markdown_provider():
@@ -56,7 +54,6 @@ class BlueprintResource(PeeweeResource):
 
     def get_query(self):
         return self.model.select().filter(Blueprint.expires >= datetime.datetime.now())
-
 
     def content_type_providers(self):
         def blueprint_markdown_provider():

@@ -1,7 +1,7 @@
-from rivr import MiddlewareController, Router
+from rivr import MiddlewareController, ErrorWrapper, Router
 from rivr.views.static import StaticView
 from rivr.wsgi import WSGIHandler
-from rivr_jinja import JinjaMiddleware
+from rivr_jinja import JinjaMiddleware, JinjaView
 from jinja2 import Environment, FileSystemLoader
 from bluepaste.models import database
 from bluepaste.resources import router
@@ -15,9 +15,13 @@ app = Router(
 
 jinja_environment = Environment(loader=FileSystemLoader('bluepaste/templates'))
 middleware = MiddlewareController.wrap(app,
-    rivr.DebugMiddleware(),
     database,
     JinjaMiddleware(jinja_environment),
 )
+
+middleware = ErrorWrapper(middleware,
+    custom_404=JinjaView.as_view(template_name='404.html', environment=jinja_environment)
+)
+
 wsgi = WSGIHandler(middleware)
 
