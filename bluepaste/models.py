@@ -24,7 +24,7 @@ EXPIRE_DEFAULT = 3600*24*14
 
 
 class Blueprint(database.Model):
-    slug = peewee.CharField(max_length=32, unique=True)
+    slug = peewee.CharField(max_length=40, unique=True)
     expires = peewee.DateTimeField()
 
     def create_revision(self, content):
@@ -40,7 +40,7 @@ class Blueprint(database.Model):
 
 class Revision(database.Model):
     blueprint = peewee.ForeignKeyField(Blueprint, related_name='revisions')
-    slug = peewee.CharField(max_length=32, unique=True)
+    slug = peewee.CharField(max_length=40, unique=True)
     content = peewee.TextField()
     created_at = peewee.DateTimeField(default=datetime.datetime.now)
 
