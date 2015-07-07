@@ -1,1 +1,1 @@
-web: gunicorn bluepaste:wsgi
+web: gunicorn bluepaste:wsgi --log-file -

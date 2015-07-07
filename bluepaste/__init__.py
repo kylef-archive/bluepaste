@@ -1,3 +1,4 @@
+import logging
 from rivr import MiddlewareController, ErrorWrapper, Router
 from rivr.views.static import StaticView
 from rivr.wsgi import WSGIHandler
@@ -6,6 +7,12 @@ from jinja2 import Environment, FileSystemLoader
 from bluepaste.models import database
 from bluepaste.resources import router
 import rivr
+
+
+logger = logging.getLogger('rivr.request')
+console = logging.StreamHandler()
+console.setLevel(logging.ERROR)
+logger.addHandler(console)
 
 
 app = Router(
