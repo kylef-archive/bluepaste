@@ -7,6 +7,30 @@
     <link rel="stylesheet" href="/static/css/bootstrap.min.css">
     <link rel="stylesheet" href="/static/css/style.css">
     <link rel="stylesheet" href="/static/css/syntax.css">
+    <script>
+      document.onreadystatechange = function () {
+        if (document.readyState == "complete") {
+          var currentUser = {% if request.browserid %}'{{ request.browserid }}'{% else %}null{% endif %};
+
+          navigator.id.watch({
+            loggedInUser: currentUser,
+            onlogin: function(assertion) {
+              var $e = $('#id_assertion');
+              $e.val(assertion.toString());
+              $e.parent().submit();
+            },
+            onlogout: function() {
+              alert("Logout");
+            }
+          });
+
+          var signinLink = document.getElementById('signin');
+          if (signinLink) {
+            signinLink.onclick = function() { navigator.id.request(); };
+          }
+        }
+      }
+    </script>
   </head>
 
   <body>
@@ -26,6 +50,21 @@
             </li>
           </ul>
         </div>
+
+        <div class="navbar-header navbar-right">
+          {% if request.browserid %}
+            <ul class="nav navbar-nav">
+              <li class="dropdown">
+                <a href="#" class="dropdown-toggle" data-toggle="dropdown" role="button" aria-haspopup="true" aria-expanded="false"><img class="avatar" src="{{ request.browserid|gravatar }}" alt="User" width=24 height=24 /><span class="caret"></span></a>
+                <ul class="dropdown-menu">
+                  <li><a href="{{ request.browserid_middleware.logout_url }}">Sign out</a></li>
+                </ul>
+              </li>
+            </ul>
+          {% else %}
+            <button type="button" id="signin" class="btn btn-primary navbar-btn">Sign in / Sign up</button>
+          {% endif %}
+        </div>
       </div>
     </header>
 
@@ -33,8 +72,13 @@
       {% block body %}{% endblock %}
     </div>
 
+    <form action="{{ request.browserid_middleware.login_url }}" method="POST">
+      <input type="hidden" name="assertion" id="id_assertion">
+    </form>
+
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.3/jquery.min.js"></script>
     <script src="/static/js/bootstrap.min.js"></script>
+    <script src="https://login.persona.org/include.js"></script>
   </body>
 </html>
 
