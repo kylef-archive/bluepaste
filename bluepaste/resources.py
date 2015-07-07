@@ -15,17 +15,18 @@ class RevisionResource(PeeweeResource):
         revision = self.get_object()
         return {
             'slug': revision.slug[:8],
-            'blueprint': revision.blueprint.slug,
+            'blueprint': revision.blueprint.slug[:8],
         }
 
     def get_query(self):
         slug = self.parameters['slug']
         blueprint_slug = self.parameters['blueprint']
 
-        return self.model.select().filter(
+        return self.model.select().join(Blueprint).where(
+            Blueprint.slug.startswith(blueprint_slug),
+            Blueprint.expires > datetime.datetime.now(),
+        ).filter(
             Revision.slug.startswith(slug),
-            blueprint__slug=blueprint_slug,
-            blueprint__expires__gt=datetime.datetime.now(),
         )
 
     def content_type_providers(self):
@@ -52,8 +53,15 @@ class BlueprintResource(PeeweeResource):
 
     revisions = RevisionResource
 
+    def get_parameters(self):
+        obj = self.get_object()
+        return {
+            'slug': obj.slug[:8],
+        }
+
     def get_query(self):
-        return self.model.select().filter(Blueprint.expires >= datetime.datetime.now())
+        slug = self.parameters['slug']
+        return self.model.select().filter(Blueprint.slug.startswith(slug), Blueprint.expires >= datetime.datetime.now())
 
     def content_type_providers(self):
         def blueprint_markdown_provider():
@@ -133,7 +141,7 @@ class RootResource(Resource):
         expires = datetime.datetime.now() + \
             datetime.timedelta(seconds=int(expires))
 
-        slug = sha1(datetime.datetime.now().isoformat() + content).hexdigest()[:8]
+        slug = sha1(datetime.datetime.now().isoformat() + content).hexdigest()
         blueprint = Blueprint.create(slug=slug, expires=expires)
         revision = blueprint.create_revision(content)
         revision_resource = RevisionResource(obj=revision)
