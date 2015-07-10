@@ -38,7 +38,7 @@ middleware = MiddlewareController.wrap(app,
     database,
     JinjaMiddleware(jinja_environment),
     SessionMiddleware(session_store=MemorySessionStore()),
-    BrowserIDMiddleware(audience='https://blueprint.herokuapp.com'),
+    BrowserIDMiddleware(audience='https://bluepaste.herokuapp.com'),
 )
 
 middleware = ErrorWrapper(middleware,
