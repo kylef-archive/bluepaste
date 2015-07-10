@@ -4,7 +4,7 @@ from rivr import Response
 from rivr_rest import Router, Resource
 from rivr_rest_peewee import PeeweeResource
 from rivr_jinja import JinjaResponse
-from bluepaste.models import database, Blueprint, Revision, EXPIRE_CHOICES, EXPIRE_DEFAULT
+from bluepaste.models import database, User, Blueprint, Revision, EXPIRE_CHOICES, EXPIRE_DEFAULT
 
 
 class RevisionResource(PeeweeResource):
@@ -94,7 +94,9 @@ class BlueprintResource(PeeweeResource):
 
 
         revision = blueprint.create_revision(content)
-        response = self.revisions(obj=revision).get(request)
+        resource = self.revisions(obj=revision)
+        resource.request = request
+        response = resource.get(request)
 
         if response.status_code == 200:
             response.status_code = 201
@@ -142,9 +144,11 @@ class RootResource(Resource):
             datetime.timedelta(seconds=int(expires))
 
         slug = sha1(datetime.datetime.now().isoformat() + content).hexdigest()
-        blueprint = Blueprint.create(slug=slug, expires=expires)
+        blueprint = Blueprint.create(slug=slug, expires=expires,
+                author=request.user)
         revision = blueprint.create_revision(content)
         revision_resource = RevisionResource(obj=revision)
+        revision_resource.request = request
         response = revision_resource.get(request)
 
         if response.status_code == 200:

@@ -23,9 +23,14 @@ EXPIRE_CHOICES = (
 EXPIRE_DEFAULT = 3600*24*14
 
 
+class User(database.Model):
+    email = peewee.CharField(unique=True)
+
+
 class Blueprint(database.Model):
     slug = peewee.CharField(max_length=40, unique=True)
     expires = peewee.DateTimeField()
+    author = peewee.ForeignKeyField(User, related_name='blueprints')
 
     def create_revision(self, content):
         created_at = datetime.datetime.now()

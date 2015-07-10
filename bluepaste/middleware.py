@@ -2,6 +2,7 @@ from browserid import verify
 
 from rivr.http import Response, ResponseRedirect, ResponseNotFound
 from rivr.middleware.base import Middleware
+from bluepaste.models import User
 
 
 class BrowserIDMiddleware(Middleware):
@@ -18,7 +19,9 @@ class BrowserIDMiddleware(Middleware):
         data = verify(request.POST['assertion'], self.audience)
 
         if data and 'email' in data:
-            request.session['browserid'] = data['email']
+            email = data['email']
+            user, created = User.create_or_get(email=email)
+            request.session['browserid'] = email
             return ResponseRedirect(self.login_success_url)
 
         return ResponseRedirect(self.login_failure_url)
@@ -36,8 +39,10 @@ class BrowserIDMiddleware(Middleware):
 
         if 'browserid' in request.session:
             request.browserid = request.session['browserid']
+            request.user = User.get(email=request.browserid)
         else:
             request.browserid = None
+            request.user = None
 
         if request.path == self.login_url:
             return self.login(request)
