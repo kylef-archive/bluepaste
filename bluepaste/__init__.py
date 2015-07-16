@@ -1,7 +1,8 @@
+import os
+import hashlib
 import logging
 from rivr import MiddlewareController, ErrorWrapper, Router
 from rivr.views.static import StaticView
-from rivr.sessions import *
 from rivr.wsgi import WSGIHandler
 from rivr_jinja import JinjaMiddleware, JinjaView
 from jinja2 import Environment, FileSystemLoader
@@ -35,11 +36,10 @@ jinja_environment.filters['gravatar'] = gravatar
 
 
 middleware = MiddlewareController.wrap(app,
+    SecureMiddleware(),
     database,
     JinjaMiddleware(jinja_environment),
-    SessionMiddleware(session_store=MemorySessionStore()),
-    SecureMiddleware(),
-    BrowserIDMiddleware(audience='https://bluepaste.herokuapp.com'),
+    BrowserIDMiddleware(audience='https://bluepaste.herokuapp.com', jwt_key=os.environ.get('JWT_KEY')),
 )
 
 middleware = ErrorWrapper(middleware,
