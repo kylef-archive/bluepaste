@@ -9,6 +9,11 @@
 {% block body %}
   <div class="tab-content">
     <div role="tabpanel" class="tab-pane" id="rendered">
+      <div class="alert alert-warning" role="alert">
+        Rendered documentation on Bluepaste is a work in progress and currently
+        doesn't show all the information in blueprints!
+      </div>
+
       {% set ast = revision.ast %}
       <h2>{{ ast.name }}</h2>
       <p>{{ ast.description }}</p>
