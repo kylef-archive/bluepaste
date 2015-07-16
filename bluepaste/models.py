@@ -35,10 +35,12 @@ class Blueprint(database.Model):
     author = peewee.ForeignKeyField(User, related_name='blueprints', null=True)
 
     def create_revision(self, content):
+        ast = requests.post('https://api.apiblueprint.org/parser', data=content).json()['ast']
+        ast_json = json.dumps(ast)
         created_at = datetime.datetime.now()
         slug_content = '{}\n{}'.format(created_at.isoformat(), content)
         slug = sha1(slug_content).hexdigest()
-        return Revision.create(blueprint=self, slug=slug, content=content)
+        return Revision.create(blueprint=self, slug=slug, content=content, ast_json=ast_json)
 
     @property
     def last_revision(self):
@@ -50,6 +52,7 @@ class Revision(database.Model):
     slug = peewee.CharField(max_length=40, unique=True)
     content = peewee.TextField()
     created_at = peewee.DateTimeField(default=datetime.datetime.now)
+    ast_json = peewee.TextField()
 
     class Meta:
         order_by = ('-created_at',)
@@ -67,7 +70,7 @@ class Revision(database.Model):
     @property
     def ast(self):
         if not hasattr(self, '_ast'):
-            self._ast = requests.post('https://api.apiblueprint.org/parser', data=self.content).json()['ast']
+            self._ast = json.loads(self.ast_json)
 
         return self._ast
 
