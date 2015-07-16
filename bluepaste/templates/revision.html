@@ -1,5 +1,11 @@
 {% extends "base.html" %}
 
+{% block extra_head %}
+<meta name="twitter:card" content="summary" />
+<meta name="twitter:title" content="{{ revision.ast.name }}" />
+<meta name="twitter:description" content="{{ revision.ast.description }}" />
+{% endblock %}
+
 {% block extra_nav %}
 <li role="presentation"><a href="#rendered" aria-controls="rendered" role="tab" data-toggle="tab">Rendered</a></li>
 <li role="presentation" class="active"><a href="#blueprint" aria-controls="blueprint" role="tab" data-toggle="tab">Blueprint</a></li>
