@@ -7,7 +7,8 @@ from rivr_peewee import Database
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
 from pygments.lexers import JsonLexer
-from pygments_markdown_lexer.lexer import MarkdownLexer
+
+from bluepaste.lexer import BlueprintLexer
 
 
 database = Database()
@@ -65,7 +66,7 @@ class Revision(database.Model):
 
     @property
     def highlighted_content(self):
-        return highlight(self.content, MarkdownLexer(), HtmlFormatter())
+        return highlight(self.content, BlueprintLexer(), HtmlFormatter())
 
     @property
     def ast(self):
