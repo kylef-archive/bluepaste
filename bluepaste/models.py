@@ -1,10 +1,12 @@
 import datetime
+import json
 from hashlib import sha1
 import requests
 import peewee
 from rivr_peewee import Database
 from pygments import highlight
 from pygments.formatters import HtmlFormatter
+from pygments.lexers import JsonLexer
 from pygments_markdown_lexer.lexer import MarkdownLexer
 
 
@@ -69,3 +71,7 @@ class Revision(database.Model):
 
         return self._ast
 
+    @property
+    def highlighted_ast(self):
+        ast = json.dumps(self.ast, sort_keys=True, indent=2, separators=(',', ': '))
+        return highlight(ast, JsonLexer(), HtmlFormatter())
