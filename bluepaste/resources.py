@@ -147,13 +147,13 @@ class RootResource(Resource):
         blueprint = Blueprint.create(slug=slug, expires=expires,
                 author=request.user)
         revision = blueprint.create_revision(content)
-        revision_resource = RevisionResource(obj=revision)
-        revision_resource.request = request
-        response = revision_resource.get(request)
+        resource = BlueprintResource(obj=blueprint)
+        resource.request = request
+        response = resource.get(request)
 
         if response.status_code == 200:
             response.status_code = 302
-            response.headers['Location'] = revision_resource.get_uri()
+            response.headers['Location'] = resource.get_uri()
 
         return response
 
