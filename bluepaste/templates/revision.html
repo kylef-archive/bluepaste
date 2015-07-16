@@ -1,37 +1,46 @@
 {% extends "base.html" %}
 
 {% block extra_nav %}
-<li role="presentation" class="active"><a href="#rendered" aria-controls="rendered" role="tab" data-toggle="tab">Rendered</a></li>
-<li role="presentation"><a href="#blueprint" aria-controls="blueprint" role="tab" data-toggle="tab">Blueprint</a></li>
+<li role="presentation"><a href="#rendered" aria-controls="rendered" role="tab" data-toggle="tab">Rendered</a></li>
+<li role="presentation" class="active"><a href="#blueprint" aria-controls="blueprint" role="tab" data-toggle="tab">Blueprint</a></li>
 {% endblock %}
 
 {% block body %}
-<div class="tab-content">
-  <div role="tabpanel" class="tab-pane active" id="rendered">
-    {% set ast = revision.ast %}
+  <div class="tab-content">
+    <div role="tabpanel" class="tab-pane" id="rendered">
+      {% set ast = revision.ast %}
+      <h2>{{ ast.name }}</h2>
+      <p>{{ ast.description }}</p>
 
-    <h2>{{ ast.name }}</h2>
-    <p>{{ ast.description }}</p>
+      {% for resourceGroup in ast.resourceGroups %}
+        <h3>{{ resourceGroup.name }}</h4>
+        <p>{{ resourceGroup.description }}</p>
 
-    {% for resourceGroup in ast.resourceGroups %}
-      <h3>{{ resourceGroup.name }}</h3>
-      <p>{{ resourceGroup.description }}</p>
+        {% for resource in resourceGroup.resources %}
+          <div class="panel panel-default">
+            <div class="panel-heading"><h4 class="panel-title">{{ resource.name }}</h4></div>
 
-      {% for resource in resourceGroup.resources %}
-        <h4>{{ resource.name }}</h4>
-        <p>{{ resource.description }}</p>
+            {% if resource.description %}
+            <div class="panel-body">
+              <p>{{ resource.description }}</p>
+            </div>
+            {% endif %}
 
-        {% for action in resource.actions %}
-          <h5>{{ action.name }}</h5>
-          <p>{{ action.description }}</p>
+            <ul class="list-group">
+              {% for action in resource.actions %}
+              <li class="list-group-item">
+                {{ action.name }}
+              </li>
+              {% endfor %}
+            </ul>
+          </div>
         {% endfor %}
-      {% endfor %}
     {% endfor %}
-  </div>
+    </div>
 
-  <div role="tabpanel" class="tab-pane" id="blueprint">
-    {{ revision.highlighted_content }}
-  </div>
+    <div role="tabpanel" class="tab-pane active" id="blueprint">
+      {{ revision.highlighted_content }}
+    </div>
 </div>
 {% endblock %}
 
