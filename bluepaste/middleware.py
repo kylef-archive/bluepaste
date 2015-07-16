@@ -53,7 +53,7 @@ class BrowserIDMiddleware(Middleware):
             encoded = request.COOKIES['jwt']
             payload = jwt.decode(encoded, self.jwt_key, algorithms=[self.jwt_algorithm])
             request.browserid = payload['email']
-            request.user = User.get(email=request.browserid)
+            request.user, created = User.create_or_get(email=request.browserid)
         else:
             request.browserid = None
             request.user = None
