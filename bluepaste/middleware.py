@@ -5,6 +5,14 @@ from rivr.middleware.base import Middleware
 from bluepaste.models import User
 
 
+class SecureMiddleware(Middleware):
+    def process_request(self, request):
+        proto = request.headers.get('X_FORWARDED_PROTO')
+        if proto == 'http':
+            return ResponseRedirect('https://bluepaste.herokuapp.com{}'.format(request.path))
+
+
+
 class BrowserIDMiddleware(Middleware):
     audience = None
 

@@ -7,7 +7,7 @@ from rivr_jinja import JinjaMiddleware, JinjaView
 from jinja2 import Environment, FileSystemLoader
 from bluepaste.models import database
 from bluepaste.resources import router
-from bluepaste.middleware import BrowserIDMiddleware
+from bluepaste.middleware import SecureMiddleware, BrowserIDMiddleware
 import rivr
 
 
@@ -38,6 +38,7 @@ middleware = MiddlewareController.wrap(app,
     database,
     JinjaMiddleware(jinja_environment),
     SessionMiddleware(session_store=MemorySessionStore()),
+    SecureMiddleware(),
     BrowserIDMiddleware(audience='https://bluepaste.herokuapp.com'),
 )
 
