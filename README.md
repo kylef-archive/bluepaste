@@ -1,6 +1,6 @@
-# Bluepaste
+# [Bluepaste](https://bluepaste.herokuapp.com)
 
-Bluepaste is an API Blueprint paste service.
+[Bluepaste](https://bluepaste.herokuapp.com) is an API Blueprint paste service. 
 
 ## Development Environment
 
