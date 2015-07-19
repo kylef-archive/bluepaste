@@ -7,7 +7,30 @@ from rivr_jinja import JinjaResponse
 from bluepaste.models import database, User, Blueprint, Revision, EXPIRE_CHOICES, EXPIRE_DEFAULT
 
 
-class RevisionResource(PeeweeResource):
+class BlueprintMixin(object):
+    def get_blueprint(self):
+        raise NotImplemented
+
+    def get_revision(self):
+        raise NotImplemented
+
+    def get_context_data(self):
+        return {
+            'blueprint': self.get_blueprint(),
+            'revision': self.get_revision(),
+        }
+
+    def html_provider(self):
+        return JinjaResponse(self.request, template_names=['revision.html'], context=self.get_context_data())
+
+    def blueprint_markdown_provider(self):
+        return Response(self.get_revision().content, content_type='text/vnd.apiblueprint+markdown')
+
+    def blueprint_ast_provider(self):
+        return Response(self.get_revision().ast_json, content_type='application/vnd.apiblueprint.ast.raw+json')
+
+
+class RevisionResource(PeeweeResource, BlueprintMixin):
     model = Revision
     uri_template = '/{blueprint}/{slug}'
 
@@ -29,23 +52,24 @@ class RevisionResource(PeeweeResource):
             Revision.slug.startswith(slug),
         )
 
+    def get_blueprint(self):
+        return self.get_object().blueprint
+
+    def get_revision(self):
+        return self.get_object()
+
     def content_type_providers(self):
-        def blueprint_markdown_provider():
-            return Response(self.get_object().content, content_type='text/vnd.apiblueprint+markdown')
-
-        def html_provider():
-            return JinjaResponse(self.request, template_names=['revision.html'], context={'revision': self.get_object()})
-
         providers = super(RevisionResource, self).content_type_providers()
         providers.update({
-            'text/vnd.apiblueprint+markdown': blueprint_markdown_provider,
-            'text/html': html_provider,
+            'text/vnd.apiblueprint+markdown': self.blueprint_markdown_provider,
+            'application/vnd.apiblueprint.ast.raw+json': self.blueprint_ast_provider,
+            'text/html': self.html_provider,
         })
 
         return providers
 
 
-class BlueprintResource(PeeweeResource):
+class BlueprintResource(PeeweeResource, BlueprintMixin):
     model = Blueprint
     uri_template = '/{slug}'
     slug_uri_parameter = 'slug'
@@ -63,17 +87,18 @@ class BlueprintResource(PeeweeResource):
         slug = self.parameters['slug']
         return self.model.select().filter(Blueprint.slug.startswith(slug), Blueprint.expires >= datetime.datetime.now())
 
+    def get_blueprint(self):
+        return self.get_object()
+
+    def get_revision(self):
+        return self.get_object().revisions[0]
+
     def content_type_providers(self):
-        def blueprint_markdown_provider():
-            return Response(self.get_object().revisions[0].content, content_type='text/vnd.apiblueprint+markdown')
-
-        def html_provider():
-            return JinjaResponse(self.request, template_names=['blueprint.html'], context={'blueprint': self.get_object()})
-
         providers = super(BlueprintResource, self).content_type_providers()
         providers.update({
-            'text/vnd.apiblueprint+markdown': blueprint_markdown_provider,
-            'text/html': html_provider,
+            'text/vnd.apiblueprint+markdown': self.blueprint_markdown_provider,
+            'application/vnd.apiblueprint.ast.raw+json': self.blueprint_ast_provider,
+            'text/html': self.html_provider,
         })
 
         return providers
