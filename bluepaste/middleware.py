@@ -46,14 +46,19 @@ class BrowserIDMiddleware(Middleware):
         response.delete_cookie('jwt')
         return response
 
+    def verify_jwt(self, request, encoded):
+        payload = jwt.decode(encoded, self.jwt_key, algorithms=[self.jwt_algorithm])
+        request.browserid = payload['email']
+        request.user, created = User.create_or_get(email=request.browserid)
+
     def process_request(self, request):
         request.browserid_middleware = self
 
-        if 'jwt' in request.COOKIES:
-            encoded = request.COOKIES['jwt']
-            payload = jwt.decode(encoded, self.jwt_key, algorithms=[self.jwt_algorithm])
-            request.browserid = payload['email']
-            request.user, created = User.create_or_get(email=request.browserid)
+        if 'AUTHORIZATION' in request.headers:
+            bearer, token = request.headers['AUTHORIZATION'].split(' ', 1)
+            self.verify_jwt(request, token)
+        elif 'jwt' in request.COOKIES:
+            self.verify_jwt(request, request.COOKIES['jwt'])
         else:
             request.browserid = None
             request.user = None
