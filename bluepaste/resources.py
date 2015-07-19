@@ -200,8 +200,7 @@ class RootResource(Resource):
         response = resource.get(request)
 
         if response.status_code == 200:
-            response.status_code = 302
-            response.headers['Location'] = resource.get_uri()
+            response.status_code = 201
 
         return response
 
