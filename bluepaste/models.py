@@ -9,6 +9,7 @@ from pygments.formatters import HtmlFormatter
 from pygments.lexers import JsonLexer
 
 from bluepaste.lexer import BlueprintLexer
+from bluepaste.config import BLUEPRINT_PARSER_URL
 
 
 database = Database()
@@ -36,7 +37,7 @@ class Blueprint(database.Model):
     author = peewee.ForeignKeyField(User, related_name='blueprints', null=True)
 
     def create_revision(self, content):
-        ast = requests.post('https://api.apiblueprint.org/parser', data=content).json()['ast']
+        ast = requests.post(BLUEPRINT_PARSER_URL, data=content).json()['ast']
         ast_json = json.dumps(ast)
         created_at = datetime.datetime.now()
         slug_content = '{}\n{}'.format(created_at.isoformat(), content)

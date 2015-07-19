@@ -9,6 +9,7 @@ from jinja2 import Environment, FileSystemLoader
 from bluepaste.models import database
 from bluepaste.resources import router
 from bluepaste.middleware import SecureMiddleware, BrowserIDMiddleware
+from bluepaste.config import *
 import rivr
 
 
@@ -39,7 +40,7 @@ middleware = MiddlewareController.wrap(app,
     SecureMiddleware(),
     database,
     JinjaMiddleware(jinja_environment),
-    BrowserIDMiddleware(audience='https://bluepaste.herokuapp.com', jwt_key=os.environ.get('JWT_KEY')),
+    BrowserIDMiddleware(audience=AUDIENCE, jwt_key=JWT_KEY),
 )
 
 middleware = ErrorWrapper(middleware,
