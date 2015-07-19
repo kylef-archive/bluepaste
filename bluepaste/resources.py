@@ -52,6 +52,12 @@ class RevisionResource(PeeweeResource, BlueprintMixin):
             Revision.slug.startswith(slug),
         )
 
+    def get_attributes(self):
+        attributes = super(RevisionResource, self).get_attributes()
+        del attributes['ast_json']
+        attributes['ast'] = self.get_revision().ast
+        return attributes
+
     def get_blueprint(self):
         return self.get_object().blueprint
 
