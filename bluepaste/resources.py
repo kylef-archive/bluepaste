@@ -110,6 +110,12 @@ class BlueprintResource(PeeweeResource, BlueprintMixin):
         return providers
 
     def post(self, request):
+        if not request.user:
+            return Response(status=401)
+
+        if request.user != self.get_blueprint().author:
+            return Response(status=403)
+
         blueprint = self.get_object()
         if request.content_length == 0:
             return Response(status=400)
