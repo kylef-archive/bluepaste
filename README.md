@@ -1,5 +1,7 @@
 # [Bluepaste](https://bluepaste.herokuapp.com)
 
+[![Build Status](https://img.shields.io/circleci/project/kylef/bluepaste.svg)](https://circleci.com/gh/kylef/bluepaste/tree/master)
+
 [Bluepaste](https://bluepaste.herokuapp.com) is an API Blueprint paste service. 
 
 ## Development Environment
