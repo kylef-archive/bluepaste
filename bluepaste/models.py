@@ -36,13 +36,13 @@ class Blueprint(database.Model):
     expires = peewee.DateTimeField()
     author = peewee.ForeignKeyField(User, related_name='blueprints', null=True)
 
-    def create_revision(self, content):
+    def create_revision(self, message, content):
         ast = requests.post(BLUEPRINT_PARSER_URL, data=content).json()['ast']
         ast_json = json.dumps(ast)
         created_at = datetime.datetime.now()
         slug_content = '{}\n{}'.format(created_at.isoformat(), content)
         slug = sha1(slug_content).hexdigest()
-        return Revision.create(blueprint=self, slug=slug, content=content, ast_json=ast_json)
+        return Revision.create(blueprint=self, slug=slug, content=content, message=message, ast_json=ast_json)
 
     @property
     def last_revision(self):
@@ -55,6 +55,7 @@ class Revision(database.Model):
     content = peewee.TextField()
     created_at = peewee.DateTimeField(default=datetime.datetime.now)
     ast_json = peewee.TextField()
+    message = peewee.TextField(null=True)
 
     class Meta:
         order_by = ('-created_at',)

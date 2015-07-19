@@ -112,13 +112,14 @@ class BlueprintResource(PeeweeResource, BlueprintMixin):
 
         if content_type == 'text/vnd.apiblueprint+markdown':
             content = request.body.read(request.content_length)
+            message = ''
         else:
             content = request.POST.get('blueprint', '')
+            message = request.POST.get('message', '')
             if len(content) == 0:
                 return Response(status=400)
 
-
-        revision = blueprint.create_revision(content)
+        revision = blueprint.create_revision(message, content)
         resource = self.revisions(obj=revision)
         resource.request = request
         response = resource.get(request)
@@ -155,6 +156,7 @@ class RootResource(Resource):
             return Response(status=400)
 
         content_type = request.headers.get('CONTENT_TYPE', None)
+        message = 'Initial blueprint'
 
         if content_type == 'text/vnd.apiblueprint+markdown':
             content = request.body.read(request.content_length)
@@ -164,6 +166,7 @@ class RootResource(Resource):
             if len(content) == 0:
                 return Response(status=400)
             expires = request.POST.get('expires', EXPIRE_DEFAULT)
+            message = request.POST.get('message', message)
 
         expires = datetime.datetime.now() + \
             datetime.timedelta(seconds=int(expires))
@@ -171,7 +174,7 @@ class RootResource(Resource):
         slug = sha1(datetime.datetime.now().isoformat() + content).hexdigest()
         blueprint = Blueprint.create(slug=slug, expires=expires,
                 author=request.user)
-        revision = blueprint.create_revision(content)
+        revision = blueprint.create_revision(message, content)
         resource = BlueprintResource(obj=blueprint)
         resource.request = request
         response = resource.get(request)
