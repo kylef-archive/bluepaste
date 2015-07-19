@@ -1,6 +1,6 @@
 import datetime
 from hashlib import sha1
-from rivr import Response
+from rivr.http import Response, ResponseNoContent
 from rivr_rest import Router, Resource
 from rivr_rest_peewee import PeeweeResource
 from rivr_jinja import JinjaResponse
@@ -134,6 +134,14 @@ class BlueprintResource(PeeweeResource, BlueprintMixin):
             response.status_code = 201
 
         return response
+
+    def delete(self, request):
+        if request.user:
+            if request.user == self.get_blueprint().author:
+                self.get_blueprint().delete_instance()
+                return ResponseNoContent()
+            return Response(status=403)
+        return Response(status=401)
 
 
 class RootResource(Resource):
