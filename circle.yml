@@ -1,0 +1,17 @@
+machine:
+  environment:
+    DATABASE_URL: postgres://ubuntu:@127.0.0.1:5432/circle_test
+    JWT_KEY: circleci-secret
+
+dependencies:
+  post:
+    - npm install -g dredd
+
+test:
+  pre:
+    - invoke migrate
+    - gunicorn bluepaste:wsgi:
+        background: true
+    - sleep 2
+  override:
+    - dredd blueprint.apib http://localhost:8000
