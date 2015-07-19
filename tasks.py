@@ -1,3 +1,4 @@
+import datetime
 import jwt
 from invoke import run, task
 
@@ -19,3 +20,11 @@ def generate_token(email):
     encoded = jwt.encode({'email': email}, JWT_KEY, algorithm=JWT_ALGORITHM)
     print('Token for {}: {}'.format(email, encoded))
 
+
+@task
+def prune():
+    """
+    Cleanup expired blueprints.
+    """
+    from bluepaste.models import Blueprint
+    Blueprint.delete().where(Blueprint.expires < datetime.datetime.now()).execute()
