@@ -40,7 +40,7 @@ middleware = MiddlewareController.wrap(app,
     SecureMiddleware(),
     database,
     JinjaMiddleware(jinja_environment),
-    BrowserIDMiddleware(audience=AUDIENCE, jwt_key=JWT_KEY),
+    BrowserIDMiddleware(audience=AUDIENCE, jwt_algorithm=JWT_ALGORITHM, jwt_key=JWT_KEY),
 )
 
 middleware = ErrorWrapper(middleware,
