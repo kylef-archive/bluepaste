@@ -155,7 +155,7 @@ class RootResource(Resource):
 
     def content_type_providers(self):
         def html_provider():
-            with open('bluepaste/static/polls-api.md', 'r') as fp:
+            with open('blueprint.apib', 'r') as fp:
                 blueprint = fp.read()
 
             return JinjaResponse(self.request, template_names=['index.html'], context={
